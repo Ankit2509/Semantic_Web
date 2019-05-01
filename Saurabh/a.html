@@ -1,0 +1,334 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script type="text/javascript" src="{% static "jquery-3.2.1.min.js" %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static "bootstrap.min.css" %}"></style>
+  </head>
+
+  <body>
+  	<h1 class="col-md-offset-3 col-md-6">If</h1>
+    <br>
+    <div class="row">
+      <div class="col-md-offset-3 col-md-6">
+        <table class="table" style="border: 5px solid black">
+          <thead>
+            <tr>
+              <th style="text-align: center;">Subject</th>
+              <th style="text-align: center;">Predicate</th>
+              <th style="text-align: center;">Object</th>
+              <th style="text-align: center;">And/Or</th>
+            </tr>
+          </thead>
+          <tbody id="addRows">
+            {% csrf_token %}
+            <tr>
+              <td><input type="text" name="sub" class="sub"></input></td>
+              <td><select name="pre" class="pre">
+              	
+              </select></td>
+              <td><input type="text" name="obj" class="obj"></input></td>
+              <td><select class="con">
+                  <option value="AND">AND</option>
+                  <option value="OR">OR</option>
+                </select></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="row1">
+      <div class="col-md-offset-3 col-md-6">
+        <div class="col-md-6">
+          <input type="button" value="Add Rule" onClick="AddRow(drop)" style="float:right"></input>
+        </div>
+        <div class="col-md-6">
+          <input type="button" value="Done" onClick="Submit()"></input>
+        </div>
+      </div>
+    </div>
+    <br>
+    
+    <br>
+    <div class="row">
+      <h3 class="col-md-offset-3 col-md-5" align="center">Database Information</h3>
+    </div>
+    <div class="row">
+      <div class="col-md-1"></div>
+      <div class="col-md-2">
+        <table class="table" style="border: 5px solid black">
+          <thead>
+            <tr>
+              <td style="text-align: center;">Directors</td>
+            </tr>
+          </thead>
+          <tbody id="addRows1">
+            
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-2">
+        <table class="table" style="border: 5px solid black">
+          <thead>
+            <tr>
+              <td style="text-align: center;">Actors</td>
+            </tr>
+          </thead>
+          <tbody id="addRows2">
+            
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-2">
+        <table class="table" style="border: 5px solid black">
+          <thead>
+            <tr>
+              <td style="text-align: center;">Movies</td>
+            </tr>
+          </thead>
+          <tbody id="addRows3">
+            
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-2">
+        <table class="table" style="border: 5px solid black">
+          <thead>
+            <tr>
+              <td style="text-align: center;">Predicates</td>
+            </tr>
+          </thead>
+          <tbody id="addRows4">
+            
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-2">
+        <table class="table" style="border: 5px solid black">
+          <thead>
+            <tr>
+              <td style="text-align: center;">Variables</td>
+            </tr>
+          </thead>
+          <tbody id="addRows5">
+            <tr>
+              <td align="center">?director</td>
+            </tr>
+            <tr>
+              <td align="center">?movie</td>
+              
+            </tr>
+            <tr>
+              <td align="center">?actor</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-1"></div>
+    </div>
+    <h3 class="col-md-offset-4 col-md-5" align="center" id="res">Results</h3>
+    <br>
+    <div class="tab1">
+      <div class="col-md-offset-4 col-md-6">
+        <table class="table" style="border: 5px solid black">
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Predicate</th>
+              <th>Object</th>
+            </tr>
+          </thead>
+          <tbody id="addR">
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+  </body>
+  <script type="text/javascript">
+    var drop="";
+    function fun(data)
+    {
+
+          var object=JSON.parse(data);
+          console.log("------------");
+          console.log(object)
+          var act = object['actors'];
+          var direc = object['directors'];
+          var pred = object['predicates'];
+          var mov = object['movies'];
+          dropDown(data);
+          
+          for(var i=0;i<direc.length;i++)
+          {
+			       var markup = "<tr><td align='center'>" + direc[i] + "</td></tr>";  
+             $("#addRows1").append(markup); 
+          }
+          for(var i=0;i<act.length;i++)
+          {
+            var markup = "<tr><td align='center'>" + act[i] + "</td></tr>";  
+             $("#addRows2").append(markup);  
+			       
+          }
+          for(var i=0;i<mov.length;i++)
+          {
+			       var markup = "<tr><td align='center'>" + mov[i] + "</td></tr>";  
+             $("#addRows3").append(markup);
+          }
+          for(var i=0;i<pred.length;i++)
+          {
+			       var markup = "<tr><td align='center'>" + pred[i] + "</td></tr>";  
+             $("#addRows4").append(markup);
+          }
+          
+          
+    }
+    $(document).ready(function(){
+      $(".tab1").hide();
+      $("#res").hide();
+    	$.ajax({
+		     type: "POST",
+		     url: "/app/getDataRuleInitial/",
+		     context: document.body,
+		     success: function(data,textStatus, xhr){
+		      // d.push(data);
+          drop=data;
+		      fun(data);
+		      // alert(obj["res"]);
+		     },
+		     // complete: function() {},
+		     error: function(xhr, textStatus, errorThrown) {
+		     	alert(xhr.status);
+		     console.log('ajax loading error...');
+		     
+		   }
+		  });
+
+		});
+    function AddRow(drop){
+      var row='<tr><td><input type="text" name="sub" class="sub"></input></td><td><select name="pre" class="pre"></select></td><td><input type="text" name="obj" class="obj"></input></td><td><select class="con"><option value="1">AND</option><option value="2">OR</option></select></td></tr>';
+      $('#addRows').append(row);
+      dropDown(drop);
+    }
+    function Submit(){
+      var sub = [];
+      var pre = [];
+      var obj = [];
+      var con = [];
+      $('#addRows > tr').each(function(){
+        sub.push($(this).find('.sub').val())
+        pre.push($(this).find('.pre').val())
+        obj.push($(this).find('.obj').val())
+        con.push($(this).find('.con').val())
+      });
+      
+           $(".row1").append("<h1 class='col-md-offset-3 col-md-6'>Then</h1> <br><div class='row'><div class='col-md-offset-3 col-md-6'><table class='table' style='border:5px solid black'><thead><tr><th>Subject</th><th>Predicate</th><th>Object</th></tr></thead><tbody id='addRows'><tr><td><input type='text' id='subj' class='subj'></input></td><td><input type='text' id='pred' class='pred'></input></td><td><input type='text' id='obje' class='obje'></input></td></tr></tbody></table></div></div><div class='col-md-offset-3 col-md-6'><div class='col-md-6'><input type='button' id='final' value='Submit' style='float:right'></input></div>");
+    
+    $("#final").click(function(){
+      // alert("getting some values");
+    	var x = tojson(sub,pre,obj,con);
+    	
+    	// alert(getAll());
+    	// alert(x);
+    });
+  	}
+
+  	function Final_Submit(){
+      
+	  return array;
+      }
+
+
+     function  dropDown(data)
+     {
+          var object=JSON.parse(data);
+          var pred = object['predicates'];
+
+
+          var txt = "";
+          for(var i in pred){
+            txt += "<option>"+pred[i]+"</option>";
+          }
+          $(".pre").html(txt);
+
+     }
+     function tojson(sub,pre,obj,con)
+     {
+     	console.log(sub);
+     	var arr=[];
+     	for(var i=0;i<(sub.length)-1;i++)
+     	{
+     		var temp={};
+     		temp["subject"]=sub[i];
+     		temp["predicate"]=pre[i];
+     		temp["object"]=obj[i];
+     		temp["connector"]=con[i];
+     		arr.push(temp);
+     		
+     	}
+     	var temp={};
+     	temp["subject"]=sub[(sub.length)-1];
+     	temp["predicate"]=pre[(sub.length)-1];
+     	temp["object"]=obj[(sub.length)-1];
+     	temp["connector"]="Then";
+     	arr.push(temp);
+     	var subje = document.getElementById("subj").value;
+	      var prede = document.getElementById("pred").value;
+	      var objec = document.getElementById("obje").value;  
+		  var array={};
+		  array["subject"]=subje;
+		  array["predicate"]=prede;
+		  array["object"]=objec; 
+		  array["connector"]="0";
+     	  arr.push(array);
+     	  var new_arr={"items":arr};
+     	  // var targetURL="";
+     	  var json_obj=JSON.stringify(new_arr);
+     	  // alert(json_obj);
+     	  $.ajax({
+		     type: "POST",
+		     url: "/app/getDataRule/",
+		     data: {
+          'data': json_obj},
+		     success: function(data,textStatus, xhr){
+          alert("Answer has been updated in the table below.");
+		      console.log(data);
+          results(data);
+		      return true;
+		     },
+		     // complete: function() {},
+		     error: function(xhr, textStatus, errorThrown) {
+		     	alert(xhr.status);
+		     console.log('ajax loading error...');
+		     return false;
+		   }
+		  });
+     	 console.log(json_obj);
+     }
+
+     function results(data)
+     {  
+          var obje=JSON.parse(data);
+          console.log("------------");
+          var sub = obje['sub'];
+          var obj = obje['obj'];
+          var pred = obje['pred'];
+          $("#res").show();
+          $(".tab1").show();
+          
+          var markup = ""
+          for(var i=0;i<sub.length;i++)
+          {
+            markup += "<tr><td>" + sub[i] + "</td><td>" + pred[i] + "</td><td>"+obj[i]+"</td></tr>";  
+             
+          }
+          $("#addR").html(markup);
+
+     }
+
+  </script>
+
+</html>

@@ -1,0 +1,206 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script type="text/javascript" src="{% static "jquery-3.2.1.min.js" %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static "bootstrap.min.css" %}"></style>
+  </head>
+
+  <body>
+  	<h1 class="col-md-offset-3 col-md-6" align="center"><u>Rule Engine for Semantic Web</u></h1>
+    <br>
+    <br>
+    <br>
+    
+    <h3 class="col-md-offset-4 col-md-5" align="center">Basic Rules Implementation</h3>
+    <br>
+    <div class="row">
+      <div class="col-md-offset-5 col-md-3">
+        <table class="table" style="border: 5px solid black">
+          <thead>
+            <tr>
+              <th style="text-align: center;" colspan="2">Select Rule</th>
+            </tr>
+          </thead>
+          <tbody id="addRows">
+            <tr>
+              <td style="text-align: center;">
+                <select name="rule" class="rule" id="rule">
+              	 <option>Transitivity</option>
+              	 <option>Inverse</option>
+              	 <option>Functional</option>
+                </select>
+              </td>
+              <td><input type="button" value="Apply Rule" onClick="send_rule()" style="float: right;"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <h3 class="col-md-offset-4 col-md-5" align="center" id="res">Results</h3>
+    <br>
+    <div class="tab1">
+      <div class="col-md-offset-4 col-md-6">
+        <h3 class="col-md-offset-4 col-md-5" align="center" id="dir">Director</h3>
+        <table class="table" style="border: 5px solid black">
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Predicate</th>
+              <th>Object</th>
+            </tr>
+          </thead>
+          <tbody id="addRows1">
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="tab3">
+      <div class="col-md-offset-4 col-md-6">
+        <!-- <h3 class="col-md-offset-4 col-md-5" align="center" id="act">Actor</h3> -->
+        <table class="table" style="border: 5px solid black" >
+          <thead>
+            <tr>
+              <th colspan="3" style="text-align: center;">Nodes not following property:</th>
+              
+            </tr>
+          </thead>
+          <tbody id="addRows3">
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+  <script type="text/javascript">
+   $(document).ready(function(){
+     $("#res").hide();
+     $("#dir").hide();
+     $("#act").hide();
+     $(".tab1").hide();
+     $(".tab2").hide();
+     $(".tab3").hide();
+
+
+    }); 
+    
+    function trans(data)
+    {
+          var object=JSON.parse(data);
+          // var sub=obj.res.subj;
+          console.log("------------");
+          console.log(object.res[0]);
+          var sub = object.res[0].subject;
+          var obj = object.res[0].object;
+          var pred = object.res[0].predicate;
+          $("#addRows1").empty();
+          $("#addRows3").empty();
+          $("#res").show();
+          $(".tab1").show();
+          $(".tab2").hide();
+          $(".tab3").hide();
+
+          console.log(sub);
+          for(var i=0;i<sub.length;i++)
+          {
+            var markup = "<tr><td>" + sub[i] + "</td><td>" + pred[i] + "</td><td>"+obj[i]+"</td></tr>";  
+            $("#addRows1").append(markup); 
+          }
+          
+    }
+    function fun(data)
+    {
+          var object=JSON.parse(data);
+          // var sub=obj.res.subj;
+          console.log("------------");
+          console.log(object.res[0]);
+          var sub = object.res[0].nodes;
+          // var obj = object.res[0].obj;
+          // var pred = object.res[0].pred;
+          $("#addRows1").empty();
+          $("#addRows3").empty();
+          $("#res").show();
+          $(".tab1").hide();
+          $(".tab2").hide();
+          $(".tab3").show();
+
+          for(var i=0;i<sub.length;i++)
+          {
+            var markup = "<tr><td colspan='3' align='center'>" + sub[i] + "</td></tr>" ;  
+            $("#addRows3").append(markup); 
+          }
+          
+    }
+  	function inv(data)
+    {
+           var object=JSON.parse(data);
+          // var sub=obj.res.subj;
+          console.log("------------");
+          console.log(object.res[0]);
+          var sub = object.res[0].subject;
+          var obj = object.res[0].object;
+          var pred = object.res[0].predicate;
+          $("#addRows3").empty();
+          $("#addRows1").empty();
+          $("#res").show();
+          $(".tab1").show();
+          $(".tab2").hide();
+          $(".tab3").hide();
+
+          console.log(sub);
+          for(var i=0;i<sub.length;i++)
+          {
+            var markup = "<tr><td>" + sub[i] + "</td><td>" + pred[i] + "</td><td>"+obj[i]+"</td></tr>";  
+            $("#addRows1").append(markup); 
+          }
+    }
+
+
+
+     function send_rule()
+     {
+     	// console.log(sub);
+     	
+     	
+	      
+     	  // var json_obj=JSON.stringify(temp);
+     	  // alert(json_obj);
+        var d=document.getElementById("rule").value;
+        // if(d=="Transitivity")
+
+        // var new_data={"rule":d};
+        // var json_obj=JSON.stringify(new_data);
+        // alert(json_obj);
+     	  $.ajax({
+		     type: "POST",
+		     url: "getData/",
+		     data: {"rule": JSON.stringify(d)},
+		     success: function(data,textStatus, xhr){
+		      console.log(data);
+          if(d=="Transitivity")
+            trans(data);
+          else if(d=="Inverse")
+            inv(data);
+          else if(d=="Functional")
+            fun(data);
+		      return true;
+		     },
+		     // complete: function() {},
+		     error: function(xhr, textStatus, errorThrown) {
+		     	alert(xhr.status);
+		     console.log('ajax loading error...');
+		     return false;
+		   }
+		  });
+     	 
+     }
+
+  </script>
+
+</html>
