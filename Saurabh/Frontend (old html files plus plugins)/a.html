@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script type="text/javascript" src="jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="bootstrap.min.css"></style>
+  </head>
+
+  <body>
+  	<h1 class="col-md-offset-3 col-md-6">If</h1>
+    <br>
+    <div class="row">
+      <div class="col-md-offset-3 col-md-6">
+        <table class="table" style="border: 5px solid black">
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Predicate</th>
+              <th>Object</th>
+              <th>And/Or</th>
+            </tr>
+          </thead>
+          <tbody id="addRows">
+            <tr>
+              <td><input type="text" name="sub" class="sub"></input></td>
+              <td><select name="pre" class="pre">
+              	<option>Predicate 1</option>
+              	<option>Predicate 2</option>
+              	<option>Predicate 3</option>
+              </select></td>
+              <td><input type="text" name="obj" class="obj"></input></td>
+              <td><select class="con">
+                  <option value="AND">AND</option>
+                  <option value="OR">OR</option>
+                </select></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="row1">
+      <div class="col-md-offset-3 col-md-6">
+        <div class="col-md-6">
+          <input type="button" value="Add Rule" onClick="AddRow()" style="float:right"></input>
+        </div>
+        <div class="col-md-6">
+          <input type="button" value="Done" onClick="Submit()"></input>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script type="text/javascript">
+  //   $(document).ready(function(){
+  //   	$.ajax({
+		//      type: "POST",
+		//      url: "http://7627c08a.ngrok.io/get_data.php",
+		//      context: document.body,
+		//      success: function(data,textStatus, xhr){
+		//       // d.push(data);
+		//       alert(data);
+		//       var obj=JSON.parse(data);
+		//       for (var i = 0; i < obj.res.length; i++) {
+  //   			var counter = obj.res[i];
+  //   			console.log(counter.arr);}
+		//       // alert(obj["res"]);
+		//      },
+		//      // complete: function() {},
+		//      error: function(xhr, textStatus, errorThrown) {
+		//      	alert(xhr.status);
+		//      console.log('ajax loading error...');
+		     
+		//    }
+		//   });
+
+		// });
+    function AddRow(){
+      var row='<tr><td><input type="text" name="sub" class="sub"></input></td><td><select name="pre" class="pre"><option>Predicate 1</option><option>Predicate 2</option><option>Predicate 3</option></select></td><td><input type="text" name="obj" class="obj"></input></td><td><select class="con"><option value="1">AND</option><option value="2">OR</option></select></td></tr>';
+      $('#addRows').append(row);
+    }
+    function Submit(){
+      var sub = [];
+      var pre = [];
+      var obj = [];
+      var con = [];
+      $('#addRows > tr').each(function(){
+        sub.push($(this).find('.sub').val())
+        pre.push($(this).find('.pre').val())
+        obj.push($(this).find('.obj').val())
+        con.push($(this).find('.con').val())
+      });
+      
+           $(".row1").append("<h1 class='col-md-offset-3 col-md-6'>Then</h1> <br><div class='row'><div class='col-md-offset-3 col-md-6'><table class='table' style='border:5px solid black'><thead><tr><th>Subject</th><th>Predicate</th><th>Object</th></tr></thead><tbody id='addRows'><tr><td><input type='text' id='subj' class='subj'></input></td><td><input type='text' id='pred' class='pred'></input></td><td><input type='text' id='obje' class='obje'></input></td></tr></tbody></table></div></div><div class='col-md-offset-3 col-md-6'><div class='col-md-6'><input type='button' id='final' value='Submit' onClick=' ' style='float:right'></input></div>");
+    
+    $("#final").click(function(){
+    	var x = tojson(sub,pre,obj,con);
+    	
+    	// alert(getAll());
+    	// alert(x);
+    });
+  	}
+
+  	function Final_Submit(){
+      
+	  return array;
+      }
+
+
+
+     function tojson(sub,pre,obj,con)
+     {
+     	console.log(sub);
+     	var arr=[];
+     	for(var i=0;i<(sub.length)-1;i++)
+     	{
+     		var temp={};
+     		temp["subject"]=sub[i];
+     		temp["predicate"]=pre[i];
+     		temp["object"]=obj[i];
+     		temp["connector"]=con[i];
+     		arr.push(temp);
+     		
+     	}
+     	var temp={};
+     	temp["subject"]=sub[(sub.length)-1];
+     	temp["predicate"]=pre[(sub.length)-1];
+     	temp["object"]=obj[(sub.length)-1];
+     	temp["connector"]="Then";
+     	arr.push(temp);
+     	var subje = document.getElementById("subj").value;
+	      var prede = document.getElementById("pred").value;
+	      var objec = document.getElementById("obje").value;  
+		  var array={};
+		  array["subject"]=subje;
+		  array["predicate"]=prede;
+		  array["object"]=objec; 
+		  array["connector"]="0";
+     	  arr.push(array);
+     	  var new_arr={"items":arr};
+     	  var targetURL="http://7627c08a.ngrok.io/send_data.php";
+     	  var json_obj=JSON.stringify(new_arr);
+     	  alert(json_obj);
+    //  	  $.ajax({
+		  //    type: "POST",
+		  //    url: targetURL,
+		  //    data: json_obj,
+		  //    success: function(data,textStatus, xhr){
+		  //     console.log(xhr.status);
+		  //     return true;
+		  //    },
+		  //    // complete: function() {},
+		  //    error: function(xhr, textStatus, errorThrown) {
+		  //    	alert(xhr.status);
+		  //    console.log('ajax loading error...');
+		  //    return false;
+		  //  }
+		  // });
+    //  	 console.log(json_obj);
+     }
+
+  </script>
+
+</html>
